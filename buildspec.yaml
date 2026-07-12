@@ -1,0 +1,17 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin <account>.dkr.ecr.ap-south-1.amazonaws.com
+      - REPO_URI=437952802943.dkr.ecr.ap-south-1.amazonaws.com/dockerapplication
+
+  build:
+    commands:
+      - mvn clean package -DskipTests
+      - docker build -t dockerapplication .
+      - docker tag dockerapplication:latest $REPO_URI:latest
+
+  post_build:
+    commands:
+      - docker push $REPO_URI:latest
